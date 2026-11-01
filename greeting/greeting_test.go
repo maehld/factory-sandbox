@@ -19,3 +19,24 @@ func TestGreet(t *testing.T) {
 		}
 	}
 }
+
+func TestGreetWith(t *testing.T) {
+	tests := []struct {
+		text string
+		name string
+		want string
+	}{
+		{"Hi", "Ada", "Hi, Ada!"},
+		{"Hi", "", "Hi, world!"},
+		{"  Hi  ", "  Ada  ", "Hi, Ada!"},
+		{"", "Ada", "Hello, Ada!"},
+		{"   ", "Ada", "Hello, Ada!"},
+		{DefaultGreeting, "Ada", "Hello, Ada!"},
+	}
+
+	for _, tt := range tests {
+		if got := GreetWith(tt.text, tt.name); got != tt.want {
+			t.Errorf("GreetWith(%q, %q) = %q, want %q", tt.text, tt.name, got, tt.want)
+		}
+	}
+}
