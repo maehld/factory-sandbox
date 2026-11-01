@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -18,13 +19,18 @@ func main() {
 }
 
 // run parses args and writes the output for a single invocation. It returns
-// the process exit code: 0 on success, 2 on a flag parsing error.
+// the process exit code: 0 on success (including -h/-help), 2 on a flag
+// parsing error.
 func run(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("greet", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	showVersion := fs.Bool("version", false, "print the version and exit")
 	name := fs.String("name", "", "who to greet")
 	if err := fs.Parse(args); err != nil {
+		// -h/-help is not an error: usage has already been written to stderr.
+		if errors.Is(err, flag.ErrHelp) {
+			return 0
+		}
 		return 2
 	}
 

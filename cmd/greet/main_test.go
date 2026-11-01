@@ -16,6 +16,8 @@ func TestRun(t *testing.T) {
 		{"named greeting", []string{"-name", "Ada"}, "Hello, Ada!\n", 0},
 		{"version", []string{"-version"}, version + "\n", 0},
 		{"version wins over name", []string{"-version", "-name", "Ada"}, version + "\n", 0},
+		{"help short flag", []string{"-h"}, "", 0},
+		{"help long flag", []string{"-help"}, "", 0},
 		{"unknown flag", []string{"-nope"}, "", 2},
 	}
 
