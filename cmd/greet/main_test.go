@@ -2,6 +2,9 @@ package main
 
 import (
 	"bytes"
+	"errors"
+	"flag"
+	"strings"
 	"testing"
 )
 
@@ -30,9 +33,26 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestRunHelp(t *testing.T) {
+	var out bytes.Buffer
+	if err := run([]string{"-h"}, &out); err != nil {
+		t.Fatalf("run(-h) returned error: %v", err)
+	}
+	if got := out.String(); !strings.Contains(got, "Usage of greet:") || !strings.Contains(got, "-greeting") {
+		t.Errorf("run(-h) printed %q, want usage text listing the flags", got)
+	}
+}
+
 func TestRunRejectsUnknownFlag(t *testing.T) {
 	var out bytes.Buffer
-	if err := run([]string{"-nope"}, &out); err == nil {
+	err := run([]string{"-nope"}, &out)
+	if err == nil {
 		t.Fatal("run with unknown flag returned nil error")
+	}
+	if errors.Is(err, flag.ErrHelp) {
+		t.Fatalf("run with unknown flag returned %v, want a parse error other than flag.ErrHelp", err)
+	}
+	if got := out.String(); !strings.Contains(got, "Usage of greet:") {
+		t.Errorf("run with unknown flag printed %q, want usage text", got)
 	}
 }
